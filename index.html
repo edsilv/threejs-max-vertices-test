@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - wireframe</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+			#log { position:absolute; top:50px; text-align:left; display:block; z-index:100; background:#000;  }
+		</style>
+	</head>
+	<body>
+		<pre id="log"></pre>
+		<button onclick="incRes()">Increase Resolution</button>
+		<button onclick="decRes()">Decrease Resolution</button>
+
+        <script src="https://unpkg.com/three@0.86.0/build/three.min.js"></script>
+        <script src="https://unpkg.com/three@0.86.0/examples/js/controls/TrackballControls.js"></script>
+		<script src="https://unpkg.com/three@0.86.0/examples/js/libs/stats.min.js"></script>
+
+		<script>
+ 
+			var camera, controls, scene, renderer, stats;
+			var plane;
+			var planeWidth = 1024;
+			var resolution = 64;
+			init();
+			animate();
+			function init() {
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 800;
+				controls = new THREE.TrackballControls( camera );
+				scene = new THREE.Scene();
+				
+				buildMesh();
+		
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				document.body.appendChild( stats.domElement );
+				window.addEventListener( 'resize', onWindowResize, false );
+			}
+			
+			function log( text ) {
+				var e = document.getElementById( "log" );
+				e.innerHTML = text; //+ "<br/>" + e.innerHTML;
+			}
+			function buildMesh(){
+				scene.remove(plane);
+    			var geom = new THREE.PlaneGeometry( planeWidth, planeWidth, resolution, resolution );    
+			    var mat =  new THREE.MeshBasicMaterial( { wireframe: true } );
+    			plane = new THREE.Mesh( geom, mat );    
+    			scene.add( plane );
+				log("Resolution: " + resolution+"<br/>Mesh num vertices: " + geom.vertices.length);
+			}
+			function incRes() {
+					resolution *=2;
+					buildMesh();
+				}
+			function decRes() {
+					resolution /=2;
+					if(resolution < 2){
+						resolution = 2; 
+					}
+					buildMesh();			
+			}
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+			function animate() {
+				requestAnimationFrame( animate );
+				stats.update();
+				controls.update();
+				renderer.render( scene, camera );
+			}
+		</script>
+
+	</body>
+</html>
