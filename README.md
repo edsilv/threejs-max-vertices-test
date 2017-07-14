@@ -1,0 +1,1 @@
+# threejs-max-vertices-test
